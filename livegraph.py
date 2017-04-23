@@ -19,13 +19,13 @@ url = 'https://api.coinmarketcap.com/v1/ticker/?convert=USD&limit=3'
 amt_xbt = 0.00330
 amt_xrp = 600
 
-plt.axis([0, 50, 21, 25], FontProperties=font_prop)
+plt.axis([0, 1000, 21, 25], FontProperties=font_prop)
 plt.title('Live Wallet USD Value', FontProperties=font_prop)
 plt.xlabel('Time (5 sec intervals)', FontProperties=font_prop)
 plt.ylabel('Total $USD Value of Crypto Wallet', FontProperties=font_prop)
 plt.ion()
 
-for i in range(100):
+for i in range(1000):
 	#pull response
 	response = requests.get(url)
 	data = response.json()
@@ -39,17 +39,30 @@ for i in range(100):
 
 	#set old for first time
 	if i==0:
+		usd_xbt_old = usd_xbt
+		usd_xrp_old = usd_xrp
 		y_old = y
 		net = 0.0
+		net_xbt = 0.0
+		net_xrp = 0.0
+
 
 	# check for increase or decrease
 	if y != y_old:
-		net = (y-y_old)/y_old
+		net = y-y_old
 		y_old = y
 
+	if usd_xbt != usd_xbt_old:
+		net_xbt = usd_xbt-usd_xbt_old
+		usd_xbt_old = usd_xbt
+
+	if usd_xrp != usd_xrp_old:
+		net_xrp = usd_xrp-usd_xrp_old
+		usd_xrp_old = usd_xrp
+
 	#display the live labels
-	tvar1 = plt.text(1, 24.8, 'USD from XBT: $'+str(usd_xbt), FontProperties=font_prop)
-	tvar2 = plt.text(1, 24.6, 'USD from XRP: $'+str(usd_xrp), FontProperties=font_prop)
+	tvar1 = plt.text(1, 24.8, 'USD from XBT: $'+str(usd_xbt)+'   ('+('-' if (-1 if net_xbt < 0 else 1) < 0 else '+')+'$'+str(abs(net_xbt))+')', FontProperties=font_prop)
+	tvar2 = plt.text(1, 24.6, 'USD from XRP: $'+str(usd_xrp)+'   ('+('-' if (-1 if net_xrp < 0 else 1) < 0 else '+')+'$'+str(abs(net_xrp))+')', FontProperties=font_prop)
 	tvar3 = plt.text(1, 24.4, 'USD total: $'+str(y)+'   ('+('-' if (-1 if net < 0 else 1) < 0 else '+')+'$'+str(abs(net))+')', FontProperties=font_prop)
 
 	#y = np.random.random()
